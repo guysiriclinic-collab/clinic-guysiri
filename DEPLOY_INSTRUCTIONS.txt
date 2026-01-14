@@ -1,0 +1,72 @@
+คำแนะนำการอัพโหลดไฟล์ขึ้น HostAtom
+================================================
+
+## ขั้นตอนที่ 1: ลบไฟล์เก่าบน Server (ยกเว้นฐานข้อมูล)
+ลบไฟล์ทั้งหมดใน httpdocs/clinic/cg/
+
+## ขั้นตอนที่ 2: อัพโหลดไฟล์ทั้งหมด
+อัพโหลดโฟลเดอร์และไฟล์เหล่านี้ไปที่ httpdocs/clinic/cg/:
+
+โฟลเดอร์:
+✓ app/
+✓ bootstrap/
+✓ config/
+✓ database/
+✓ public/
+✓ resources/
+✓ routes/
+✓ storage/
+✓ vendor/
+
+ไฟล์สำคัญ:
+✓ index.php (ไฟล์ใหม่ที่สร้างขึ้น)
+✓ .htaccess_production (เปลี่ยนชื่อเป็น .htaccess)
+✓ .env.hostatom (เปลี่ยนชื่อเป็น .env)
+✓ artisan
+✓ composer.json
+✓ composer.lock
+
+ไม่ต้องอัพโหลด:
+✗ .env.laragon
+✗ node_modules/
+✗ .git/
+✗ cg_database.sql
+✗ test.php
+✗ clear_cache.php
+✗ index_root.php
+✗ DEPLOY_INSTRUCTIONS.txt (ไฟล์นี้)
+
+## ขั้นตอนที่ 3: เปลี่ยนชื่อไฟล์บน Server
+1. เปลี่ยน .htaccess_production เป็น .htaccess
+2. เปลี่ยน .env.hostatom เป็น .env
+
+## ขั้นตอนที่ 4: ตั้งค่า Permission
+ตั้งค่า permission ผ่าน File Manager หรือ FTP:
+- storage/ และโฟลเดอร์ย่อยทั้งหมด: 775
+- bootstrap/cache/: 775
+
+## ขั้นตอนที่ 5: Import ฐานข้อมูล
+1. เข้า phpMyAdmin
+2. เลือกฐานข้อมูล caseto_clinicza
+3. Import ไฟล์ cg_database.sql
+
+## ขั้นตอนที่ 6: เคลียร์ Cache (ถ้ามี Terminal)
+cd httpdocs/clinic/cg
+php artisan config:clear
+php artisan cache:clear
+php artisan route:clear
+php artisan view:clear
+
+## ขั้นตอนที่ 7: ทดสอบ
+เข้า: https://casetohomes.com/clinic/cg/
+
+ควรเห็นหน้า Login
+
+## ถ้าเจอปัญหา:
+1. เข้า https://casetohomes.com/clinic/cg/test.php เพื่อตรวจสอบ
+2. ดู error log ใน storage/logs/laravel.log
+3. ตรวจสอบว่า .env มีค่าถูกต้อง
+
+## หลังจากใช้งานได้แล้ว:
+1. แก้ไข .env เปลี่ยน APP_DEBUG=true เป็น APP_DEBUG=false
+2. ลบไฟล์ test.php, clear_cache.php ออก (ถ้ามี)

@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: clinic-app
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    volumes:
+      - ./storage:/var/www/html/storage
+      - ./bootstrap/cache:/var/www/html/bootstrap/cache
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      - APP_ENV=staging
+      - APP_DEBUG=true
+      - DB_HOST=db
+      - DB_DATABASE=clinic
+      - DB_USERNAME=clinic
+      - DB_PASSWORD=secret123
+    networks:
+      - clinic-network
+
+  db:
+    image: mysql:8.0
+    container_name: clinic-db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: clinic
+      MYSQL_USER: clinic
+      MYSQL_PASSWORD: secret123
+      MYSQL_ROOT_PASSWORD: rootsecret
+    volumes:
+      - dbdata:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - clinic-network
+
+networks:
+  clinic-network:
+    driver: bridge
+
+volumes:
+  dbdata:
+    driver: local
